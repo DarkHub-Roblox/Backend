@@ -1,6 +1,6 @@
 getgenv().SecureMode = true
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-print("hi")
+
 local Window = Rayfield:CreateWindow({
    Name = "Dark Hub",
    LoadingTitle = "Dark Hub",
