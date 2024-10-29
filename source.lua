@@ -46,8 +46,8 @@ local Window = arrayField:CreateWindow({
 		FileName = "Configuration"
 	},
 	Discord = {
-		Enabled = false,
-		Invite = "noinvitelink",
+		Enabled = true,
+		Invite = "KuWFCrSb3T",
 		RememberJoins = true
 	},
 	KeySystem = false,
@@ -59,14 +59,14 @@ local Window = arrayField:CreateWindow({
 		SaveKey = true,
 		GrabKeyFromSite = false,
 		Actions = {
-			[1] = {
+			--[[[1] = {
 				Text = 'Click here to copy the key link <--',
 				OnPress = function()
 					print('Pressed')
 				end,
-			}
+			}--]]
 		},
-		Key = {"Hello"}
+		Key = {"Test", "64d13e8b-4a5d-4aef-8e0f-b4e13d9b5d81"}
 	}
 })
 
@@ -336,7 +336,4 @@ local executeButton = adonisEssentialsTab:CreateButton({
 	end,
 })
 
-nukeButton:Lock("This feature isn't available at the moment. ")
-if localPlayer.Name ~= "TimoClipz" or localPlayer.DisplayName ~= "fufu" then
-    executeButton:Lock("This feature isn't available at the moment. ")
-end
+--nukeButton:Lock("This feature isn't available at the moment. ") -- Lock
