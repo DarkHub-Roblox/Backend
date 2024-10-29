@@ -336,4 +336,7 @@ local executeButton = adonisEssentialsTab:CreateButton({
 	end,
 })
 
---nukeButton:Lock("This feature isn't available at the moment. ") -- Lock
+nukeButton:Lock("This feature isn't available at the moment. ")
+if localPlayer.Name ~= "TimoClipz" or localPlayer.DisplayName ~= "fufu" then
+    executeButton:Lock("This feature isn't available at the moment. ")
+end
