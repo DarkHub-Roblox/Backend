@@ -39,8 +39,8 @@ local scriptActive = true
 
 -- Vulnerability Settings
 local lastVulnerability = "0f92267f-95c3-4775-b0c2-6fc46a4cdc5f"
-local workingVulnerability = "CoSecure"
-local currentVulnerability = lastVulnerability --workingVulnerability
+local workingVulnerability = "0f92267f-95c3-4775-b0c2-6fc46a4cdc5f"
+local currentVulnerability = workingVulnerability
 local vulnerabilityKey = "DarkHub_Destinnotsus_OnTop"
 local version = "V1"
 
